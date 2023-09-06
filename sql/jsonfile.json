@@ -1,0 +1,99 @@
+let value = await [{
+    "state_type":"Globe",
+    "type":"Sales",
+    "tax":"5",
+},
+{
+    "state_type":"Globe",
+    "type":"Sales",
+    "tax":"12",
+},{
+    "state_type":"Globe",
+    "type":"Sales",
+    "tax":"18",
+},
+{
+    "state_type":"Globe",
+    "type":"Sales",
+    "tax":"28",
+},
+{
+    "state_type":"Local",
+    "type":"Sales",
+    "tax":"5",
+},
+{
+    "state_type":"Local",
+    "type":"Sales",
+    "tax":"12",
+},
+{
+    "state_type":"Local",
+    "type":"Sales",
+    "tax":"18",
+},
+{
+    "state_type":"Local",
+    "type":"Sales",
+    "tax":"28",
+},
+{
+    "state_type":"Globe",
+    "type":"Sales",
+    "tax":"null",
+},
+{
+    "state_type":"Local",
+    "type":"Sales",
+    "tax":"null",
+},
+{
+    "state_type":"Globe",
+    "type":"Purchase",
+    "tax":"5",
+},
+{
+    "state_type":"Globe",
+    "type":"Purchase",
+    "tax":"12",
+},
+{
+    "state_type":"Globe",
+    "type":"Purchase",
+    "tax":"18",
+},
+{
+    "state_type":"Globe",
+    "type":"Purchase",
+    "tax":"28",
+},
+{
+    "state_type":"Local",
+    "type":"Purchase",
+    "tax":"5",
+},
+{
+    "state_type":"Local",
+    "type":"Purchase",
+    "tax":"12",
+},
+{
+    "state_type":"Local",
+    "type":"Purchase",
+    "tax":"18",
+},
+{
+    "state_type":"Local",
+    "type":"Purchase",
+    "tax":"28",
+},
+{
+    "state_type":"Local",
+    "type":"Purchase",
+    "tax":"null",
+},
+{
+    "state_type":"Globe",
+    "type":"Purchase",
+    "tax":"null",
+}];

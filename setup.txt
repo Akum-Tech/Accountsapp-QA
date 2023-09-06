@@ -1,0 +1,84 @@
+npm i -D babel-core babel-polyfill babel/cli babel/node babel/preset-env nodemon
+
+<VirtualHost *:80>
+    ServerName simplitrain.in
+
+    # Tell Apache and Passenger where your app's code directory is
+    DocumentRoot root/Project/simplitrain_backend/
+    PassengerAppRoot root/Project/simplitrain_backend/dist/
+
+    # Tell Passenger that your app is a Node.js app
+    PassengerAppType node
+    PassengerStartupFile server.js
+
+    # Relax Apache security settings
+    <Directory root/Project/simplitrain_backend/>
+      Allow from all
+      Options -MultiViews
+      # Uncomment this if you're on Apache >= 2.4:
+      #Require all granted
+    </Directory>
+</VirtualHost>
+
+server {
+    listen 80;
+    listen [::]:80;
+    root /Project/simplitrain_backend/;
+    server_name api.simplitrain.in;
+    location / {
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
+        proxy_pass http://localhost:7557;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_ignore_client_abort on;
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+
+
+PATH : android/settings.gradle
+settings.gradle
+
+include ':react-native-file-transfer'
+project(':react-native-file-transfer').projectDir = new File(settingsDir, '../node_modules/@remobile/react-native-file-transfer/android')
+
+include ':react-native-cordova'
+project(':react-native-cordova').projectDir = new File(settingsDir, '../node_modules/@remobile/react-native-cordova/android')
+
+PATH : android/app/build.gradle
+build.gradle
+
+implementation project(':react-native-file-transfer')
+ implementation project(':react-native-cordova')
+
+ Path : android/build.gradle
+
+dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.google.gms:google-services:3.2.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+
+    PATH : android/app/build.gradle
+build.gradle
+dependencies add this three line in bottom
+
+//Add these lines
+    implementation "com.google.android.gms:play-services-base:15.0.0"
+    implementation "com.google.firebase:firebase-core:15.0.2"
+    implementation "com.google.firebase:firebase-messaging:15.0.2"
+
+
+    PATH : android/app/main/AndroidManifest.xml
+
+<uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+upper application tag
