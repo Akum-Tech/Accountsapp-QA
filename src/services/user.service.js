@@ -16,7 +16,6 @@ var handlebars = require("handlebars");
 import subcriptionFreePeriod from "../models/subcription_free_period";
 import SubscriptionTranction from "../models/subscriptionTransction";
 import addSubusers from "../models/addsubusers";
-import compUserSubUserTrack from "../models/userSubUsertrack"
 import { decreption } from "../security/company";
 var fs = require("fs");
 const path = require("path");
@@ -60,49 +59,6 @@ async function gettemplate(path, sendotp) {
   // return templaten;
 }
 
-// exports.getSingleData = async function (id, data, res) {
-//   try {
-//     let createdata = await User.findOne({
-//       where: {
-//         uid: id
-//       }
-//     });
-//     if (createdata) {
-//       let countcomapny = await Company.findAll({
-//         where: {
-//           user_id: createdata.dataValues.uid
-//         }
-//       });
-
-//       createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-//       createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-//       console.log("resp----->", createdata.dataValues);
-//       return {
-//         statusCode: res.statusCode,
-//         success: true,
-//         message: "User fetch Successfully",
-//         user: createdata
-//       };
-//     } else {
-//       return {
-//         statusCode: res.statusCode,
-//         success: true,
-//         message: "User not Found!",
-//         user: createdata ? createdata : {}
-//       };
-//     }
-//   } catch (e) {
-//     console.log(e)
-//     return {
-//       statusCode: await checkCode("error"),
-//       success: false,
-//       error: e,
-//       message: "Something went wrong!"
-//     };
-//   }
-// };
-
-
 exports.getSingleData = async function (id, data, res) {
   try {
     let createdata = await User.findOne({
@@ -111,114 +67,15 @@ exports.getSingleData = async function (id, data, res) {
       }
     });
     if (createdata) {
-      var findMainUser;
-      if (data.subUser_id) {
-        findMainUser = await addSubusers.findAll({
-          where: {
-            sub_user_id: data.subUser_id, is_Invited: 'Yes'
-          }
-        }).map((node) => node.get({
-          plain: true
-        }));
-        let filter = {}
-        filter.where = {}
-        if (findMainUser != '' || findMainUser != null || findMainUser != undefined) {
-          filter.where = {
-            [Op.or]: [
-              { user_id: data.uid },
-              { uid: findMainUser[0].company_id }
-            ]
-          }
-        } else {
-          filter.where.user_id = data.uid;
+      let countcomapny = await Company.findAll({
+        where: {
+          user_id: createdata.dataValues.uid
         }
-        let countcomapny = await Company.findAll(filter)
-          .then(async (resp) => {
-            if (resp.length > 0) {
-              let checkset = [...new Set(resp.map(x => x.user_id))]
-              let arr = []
-              for (let i = 0; i < checkset.length; i++) {
-                let userEmailFind = await User.findOne({
-                  where: {
-                    uid: checkset[i]
-                  },
-                  attributes: ['email']
-                })
-                let resp1 = resp.filter((item) => item.user_id == checkset[i])
-                let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
-                arr.push(response)
-              }
-              createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-              createdata.dataValues.companyList = arr
-            }
-          })
-        // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-        // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);
-      } else {
-        //mainUsers Login Scenario
-        let findSubUsers = await addSubusers.findAll({
-          where: {
-            mainuser_id: data.uid, is_Invited: 'Yes'
-          }
-        }).map((node) => node.get({
-          plain: true
-        }));
-        console.log('findSubUsers---->', findSubUsers)
-        if (findSubUsers.length > 0) {
-          let subUserComp = findSubUsers.map((user) => user.company_id)
-          console.log('mainuser--->', mainUser)
-          let filter = {}
-          filter.where = {}
-          filter.where = {
-            [Op.or]: [
-              { user_id: data.uid },
-              { uid: subUserComp }
-            ]
-          }
-          let countcomapny = await Company.findAll(filter).then(async (resp) => {
-            if (resp.length > 0) {
-              let checkset = [...new Set(resp.map(x => x.user_id))]
-              console.log('check set---->', checkset)
-              let arr = []
-              for (let i = 0; i < checkset.length; i++) {
-                let userEmailFind = await User.findOne({
-                  where: {
-                    uid: checkset[i]
-                  },
-                  attributes: ['email']
-                })
-                let resp1 = resp.filter((item) => item.user_id == checkset[i])
-                let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
-                arr.push(response)
-              }
-              createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-              createdata.dataValues.companyList = arr
-            }
-          })
-          // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-          // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-        } else {
-          //mainuser donthave any subuser login scenario
-          let countcomapny = await Company.findAll({
-            where: {
-              user_id: createdata.dataValues.uid
-            }
-          });
+      });
 
-          createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-          createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-          console.log("resp----->", createdata.dataValues);
-        }
-      }
-      // let countcomapny = await Company.findAll({
-      //   where: {
-      //     user_id: createdata.dataValues.uid
-      //   }
-      // });
-
-      // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-      // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-      // console.log("resp----->", createdata.dataValues);
+      createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
+      createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
+      console.log("resp----->", createdata.dataValues);
       return {
         statusCode: res.statusCode,
         success: true,
@@ -243,6 +100,148 @@ exports.getSingleData = async function (id, data, res) {
     };
   }
 };
+
+
+// exports.getSingleData = async function (id, data, res) {
+//   try {
+//     let createdata = await User.findOne({
+//       where: {
+//         uid: id
+//       }
+//     });
+//     if (createdata) {
+//       var findMainUser;
+//       if (data.subUser_id) {
+//         findMainUser = await addSubusers.findAll({
+//           where: {
+//             sub_user_id: data.subUser_id, is_Invited: 'Yes'
+//           }
+//         }).map((node) => node.get({
+//           plain: true
+//         }));
+//         let filter = {}
+//         filter.where = {}
+//         if (findMainUser != '' || findMainUser != null || findMainUser != undefined) {
+//           filter.where = {
+//             [Op.or]: [
+//               { user_id: data.uid },
+//               { uid: findMainUser[0].company_id }
+//             ]
+//           }
+//         } else {
+//           filter.where.user_id = data.uid;
+//         }
+//         let countcomapny = await Company.findAll(filter)
+//           .then(async (resp) => {
+//             if (resp.length > 0) {
+//               let checkset = [...new Set(resp.map(x => x.user_id))]
+//               let arr = []
+//               for (let i = 0; i < checkset.length; i++) {
+//                 let userEmailFind = await User.findOne({
+//                   where: {
+//                     uid: checkset[i]
+//                   },
+//                   attributes: ['email']
+//                 })
+//                 let resp1 = resp.filter((item) => item.user_id == checkset[i])
+//                 let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
+//                 arr.push(response)
+//               }
+//               createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
+//               createdata.dataValues.companyList = arr
+//             }
+//           })
+//         // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
+//         // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);
+//       } else {
+//         //mainUsers Login Scenario
+//         let findSubUsers = await addSubusers.findAll({
+//           where: {
+//             mainuser_id: data.uid, is_Invited: 'Yes'
+//           }
+//         }).map((node) => node.get({
+//           plain: true
+//         }));
+//         console.log('findSubUsers---->', findSubUsers)
+//         if (findSubUsers.length > 0) {
+//           let subUserComp = findSubUsers.map((user) => user.company_id)
+//           console.log('mainuser--->', mainUser)
+//           let filter = {}
+//           filter.where = {}
+//           filter.where = {
+//             [Op.or]: [
+//               { user_id: data.uid },
+//               { uid: subUserComp }
+//             ]
+//           }
+//           let countcomapny = await Company.findAll(filter).then(async (resp) => {
+//             if (resp.length > 0) {
+//               let checkset = [...new Set(resp.map(x => x.user_id))]
+//               console.log('check set---->', checkset)
+//               let arr = []
+//               for (let i = 0; i < checkset.length; i++) {
+//                 let userEmailFind = await User.findOne({
+//                   where: {
+//                     uid: checkset[i]
+//                   },
+//                   attributes: ['email']
+//                 })
+//                 let resp1 = resp.filter((item) => item.user_id == checkset[i])
+//                 let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
+//                 arr.push(response)
+//               }
+//               createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
+//               createdata.dataValues.companyList = arr
+//             }
+//           })
+//           // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
+//           // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
+//         } else {
+//           //mainuser donthave any subuser login scenario
+//           let countcomapny = await Company.findAll({
+//             where: {
+//               user_id: createdata.dataValues.uid
+//             }
+//           });
+
+//           createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
+//           createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
+//           console.log("resp----->", createdata.dataValues);
+//         }
+//       }
+//       // let countcomapny = await Company.findAll({
+//       //   where: {
+//       //     user_id: createdata.dataValues.uid
+//       //   }
+//       // });
+
+//       // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
+//       // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
+//       // console.log("resp----->", createdata.dataValues);
+//       return {
+//         statusCode: res.statusCode,
+//         success: true,
+//         message: "User fetch Successfully",
+//         user: createdata
+//       };
+//     } else {
+//       return {
+//         statusCode: res.statusCode,
+//         success: true,
+//         message: "User not Found!",
+//         user: createdata ? createdata : {}
+//       };
+//     }
+//   } catch (e) {
+//     console.log(e)
+//     return {
+//       statusCode: await checkCode("error"),
+//       success: false,
+//       error: e,
+//       message: "Something went wrong!"
+//     };
+//   }
+// };
 
 exports.getAllData = async function (data, res) {
   try {
@@ -870,379 +869,6 @@ exports.loginUser = async function (data, res) {
     };
   }
 };
-
-//for user and subuser
-exports.loginUser = async function (data, res) {
-  try {
-    let emailotp = otpGenerator.generate(6, {
-      alphabets: false,
-      upperCase: false,
-      specialChars: false
-    });
-    let smsotp = otpGenerator.generate(6, {
-      alphabets: false,
-      upperCase: false,
-      specialChars: false
-    });
-    let finddata = await User.findOne({
-      where: {
-        [Op.or]: [
-          data.email ? { email: data.email } : null,
-          data.phone ? { phone: data.phone } : null
-        ]
-      }
-    });
-    if (finddata) {
-      console.log('sha1(data.password)----->', sha1(data.password))
-      console.log('finddata.password------>', finddata.password)
-      if (sha1(data.password) === finddata.password) {
-        let findSubUsersComp = await addSubusers.findAll({
-          where: {
-            userid_gen: finddata.uid
-          }
-        })
-        if (findSubUsersComp) {
-          let companyList = [];
-          console.log('findSubUsersComp------------------>', findSubUsersComp)
-          companyList = findSubUsersComp.company_id
-
-        }
-
-
-
-
-        if (data.email != undefined) {
-          console.log('data workingmail', typeof (data.email))
-
-          if (finddata.dataValues.is_email_verify == 0) {
-            data.email_otp = emailotp;
-          }
-        }
-        if (data.phone != undefined) {
-          console.log('data working', data.phone)
-          if (finddata.dataValues.is_mobile_verify == 0) {
-            data.sms_otp = smsotp;
-          }
-        }
-
-        data.password = await sha1(data.password);
-        let updatedata = await finddata.update(data);
-        if (updatedata) {
-          let token = await jwt.sign(
-            {
-              data: updatedata.dataValues
-            },
-            "AccountingApi"
-          );
-          updatedata.dataValues.token = token;
-
-          let countcomapny = await Company.findAll({
-            where: {
-              user_id: updatedata.uid
-            },
-            attributes: [
-              [sequelize.fn("COUNT", sequelize.col("company_name")), "company"]
-            ]
-          });
-          updatedata.dataValues.comapny = countcomapny[0];
-          delete updatedata.dataValues.password;
-          delete updatedata.dataValues.email_otp;
-          delete updatedata.dataValues.sms_otp;
-          // delete updatedata.dataValues.android_token;
-          // delete updatedata.dataValues.apple_token;
-          updatedata.dataValues.serverdate = new Date()
-            .toISOString()
-            .slice(0, 10);
-          if (data.phone != undefined) {
-            if (finddata.dataValues.is_mobile_verify == 0) {
-              let url = Constant.smsurl;
-              let urlwithnumber = url.concat(data.phone);//phno            
-              let v3 = urlwithnumber.concat("&message=");
-              let userName = updatedata.dataValues.name;
-              let msg1 = `Dear ${userName}, ${data.sms_otp} is the OTP to verify your mobile number.%nRegards,%nTeam, Intellinvest Pvt. Ltd.`
-              console.log('msg1----------->', msg1)
-              let v4 = v3.concat(msg1)
-              console.log('v4------------------->', v4)
-              let msg = v4;
-
-              console.log("smstemplate inlogin------------------->", msg);
-
-              axios
-                .get(msg)
-                .then(function (response) {
-                  // handle success
-                  console.log('response--------------------------------->', JSON.stringify(response.data));
-                })
-                .catch(function (error) {
-                  console.log('errrooor--------------------->', JSON.stringify(error));
-                })
-            }
-          }
-          if (data.email != undefined) {
-            if (finddata.dataValues.is_email_verify == 0) {
-              var html = fs.readFileSync(
-                path.resolve(__dirname, "../template/email.html"),
-                "utf8"
-              );
-              var template = handlebars.compile(html);
-              var replacements = {
-                otp: emailotp
-              };
-              var htmlToSend = template(replacements);
-              let userMailName = updatedata.dataValues.name;
-              let mailotpTrigger1 = await mailotpTrigger.otpmailTrigger(data.email, htmlToSend, userMailName, 0)
-            }
-          }
-          return {
-            statusCode: res.statusCode,
-            success: true,
-            message: "User Login Successfully",
-            user: updatedata
-          };
-        } else {
-          return {
-            statusCode: res.statusCode,
-            success: false,
-            message: "Something went wrong!"
-          };
-        }
-      } else {
-        return {
-          statusCode: res.statusCode,
-          success: false,
-          message: "Password incorrect!",
-          user: {}
-        };
-      }
-    } else {
-      if (data.logintype == 1) {
-        return {
-          statusCode: res.statusCode,
-          success: false,
-          message: "Email ID not exist!"
-        };
-      } else {
-        return {
-          statusCode: res.statusCode,
-          success: false,
-          message: "Phone Number not exist!"
-        };
-      }
-    }
-  } catch (e) {
-    return {
-      statusCode: await checkCode("error"),
-      success: false,
-      error: e.message,
-      message: "Something went wrong!"
-    };
-  }
-};
-
-
-
-// exports.loginUser = async function (data, res) {
-//   try {
-//     let emailotp = otpGenerator.generate(6, {
-//       alphabets: false,
-//       upperCase: false,
-//       specialChars: false
-//     });
-//     let smsotp = otpGenerator.generate(6, {
-//       alphabets: false,
-//       upperCase: false,
-//       specialChars: false
-//     });
-//     //let finddata = await  User.findOne({ where: {email:data.email}});
-//     // let obj = null;
-//     // if (data.logintype == 1) {
-//     //     obj = {
-//     //         where: {
-//     //             email: data.email
-//     //         }
-//     //     };
-//     // } else {
-//     //     obj = {
-//     //         where: {
-//     //             phone: data.phone
-//     //         }
-//     //     };
-//     // }
-
-//     let findSubUsers = await addSubusers.findOne({
-//       where: {
-//         [Op.or]: [
-//           data.email ? { email: data.email } : null,
-//           data.phone ? { phone: data.phone } : null
-//         ]
-//       }
-//     })
-//     if (findSubUsers) {
-//       return {
-//         statusCode: res.statusCode,
-//         success: false,
-//         message: "Already an SubUser and your Id is" + findSubUsers.SubUserId + "for the user" + findSubUsers.currentUserName
-//       }
-//     } else {
-
-//       let finddata = await User.findOne({
-//         where: {
-//           [Op.or]: [
-//             data.email ? { email: data.email } : null,
-//             data.phone ? { phone: data.phone } : null
-//           ]
-//         }
-//       });
-//       if (finddata) {
-//         if (sha1(data.password) === finddata.password) {
-//           if (finddata.dataValues.is_email_verify == 0) {
-//             data.email_otp = emailotp;
-//           }
-//           if (finddata.dataValues.is_mobile_verify == 0) {
-//             data.sms_otp = smsotp;
-//           }
-//           data.password = await sha1(data.password);
-//           let updatedata = await finddata.update(data);
-//           if (updatedata) {
-//             let token = await jwt.sign(
-//               {
-//                 data: updatedata.dataValues
-//               },
-//               "AccountingApi"
-//             );
-//             updatedata.dataValues.token = token;
-
-//             let countcomapny = await Company.findAll({
-//               where: {
-//                 user_id: updatedata.uid
-//               },
-//               attributes: [
-//                 [sequelize.fn("COUNT", sequelize.col("company_name")), "company"]
-//               ]
-//             });
-//             updatedata.dataValues.comapny = countcomapny[0];
-//             delete updatedata.dataValues.password;
-//             delete updatedata.dataValues.email_otp;
-//             delete updatedata.dataValues.sms_otp;
-//             // delete updatedata.dataValues.android_token;
-//             // delete updatedata.dataValues.apple_token;
-//             updatedata.dataValues.serverdate = new Date()
-//               .toISOString()
-//               .slice(0, 10);
-
-//             if (finddata.dataValues.is_mobile_verify == 0) {
-//               let url = Constant.smsurl;
-//               let urlwithnumber = url.concat(data.phone);
-//               let v3 = urlwithnumber.concat("&message=");
-//               let v4 = v3.concat(Constant.verficationotpmsgtxt1);
-//               let v5 = v4.concat(smsotp);
-//               let msg = v5; //.concat(Constant.verficationotpmsgtxt2);
-//               //let msg='Your GST account mobile verification code is'+ otp +'Team CYBERNETIC SYSTEMS';
-//               console.log("smstemplate", msg);
-//               //let lasturl=data.concat(msg);
-//               axios
-//                 .get(msg)
-//                 .then(function (response) {
-//                   // handle success
-//                   console.log(response);
-//                   console.log("response");
-//                 })
-//                 .catch(function (error) {
-//                   // handle error
-//                   console.log(error);
-//                   console.log("error");
-//                 })
-//                 .then(function () {
-//                   // always executed
-//                   console.log("always");
-//                 });
-//             }
-
-//             if (finddata.dataValues.is_email_verify == 0) {
-//               var html = fs.readFileSync(
-//                 path.resolve(__dirname, "../template/email.html"),
-//                 "utf8"
-//               );
-//               var template = handlebars.compile(html);
-//               var replacements = {
-//                 otp: emailotp
-//               };
-//               var htmlToSend = template(replacements);
-//               let userMailName = updatedata.dataValues.name;
-//               let mailotpTrigger1 = await mailotpTrigger.otpmailTrigger(data.email, htmlToSend, userMailName, 0)
-
-
-
-//             }
-
-//             let findSubUsers = await addSubusers.findOne({
-//               where: {
-//                 [Op.or]: [
-//                   data.email ? { email: data.email } : null,
-//                   data.phone ? { phone: data.phone } : null
-//                 ]
-//               }
-//             })
-//             if (findSubUsers.subUser_id) {
-//               return {
-//                 statusCode: res.statusCode,
-//                 success: true,
-//                 message: "User Login Successfully",
-//                 user: updatedata,
-//                 subUserDetails: findSubUsers,
-
-//               };
-//             } else {
-//               return {
-//                 statusCode: res.statusCode,
-//                 success: true,
-//                 message: "User Login Successfully",
-//                 user: updatedata
-//               };
-//             }
-
-
-//           } else {
-//             return {
-//               statusCode: res.statusCode,
-//               success: false,
-//               message: "Something went wrong!"
-//             };
-//           }
-//         } else {
-//           return {
-//             statusCode: res.statusCode,
-//             success: false,
-//             message: "Password incorrect!",
-//             user: {}
-//           };
-//         }
-//       } else {
-//         if (data.logintype == 1) {
-//           return {
-//             statusCode: res.statusCode,
-//             success: false,
-//             message: "Email ID not exist!"
-//           };
-//         } else {
-//           return {
-//             statusCode: res.statusCode,
-//             success: false,
-//             message: "Phone Number not exist!"
-//           };
-//         }
-//       }
-
-//     }
-//   } catch (e) {
-//     return {
-//       statusCode: await checkCode("error"),
-//       success: false,
-//       error: e.message,
-//       message: "Something went wrong!"
-//     };
-//   }
-// };
 
 exports.verifyotpemail = async function (data, res) {
   try {
@@ -2019,28 +1645,31 @@ exports.addSubUser = async function (req, res) {
         sub_user_id: existingUsersFind.dataValues.uid,
         sub_user_unique_id: uniqid()
       }
+      let userName = existingUsersFind.dataValues.name
 
       let createSubUser = await addSubusers.create(obj)
       if (req.body.email) {
-        // let data = await mailTrigger(req.body.userName, req.body.password, req.body.email, req.body.company_name, 0)
-        // if (data) {
+        let data = await mailTrigger(userName, req.body.password, req.body.email, req.body.companyName, 0)
+        console.log('123456')
+        if (data) {
+          console.log('789456123')
           res.json({
             statusCode: res.statusCode,
             success: true,
             message: "subUser Created Successfully",
             // user: createdata
           });
-        // }
+        }
       } else {
-        // let mobiledata = await MobileTrigger(req.body.phone, req.body.password, req.body.company_name, 0)
-        // if (mobiledata) {
+        let mobiledata = await MobileTrigger(userName, req.body.phone, req.body.password, req.body.companyName, 0)
+        if (mobiledata) {
           res.json({
             statusCode: res.statusCode,
             success: true,
             message: "subUser Created Successfully",
             // user: createdata
           });
-        // }
+        }
       }
 
     } else {
@@ -2077,31 +1706,32 @@ exports.addSubUser = async function (req, res) {
         let createSubUser = await addSubusers.create(obj)
         if (createSubUser) {
           if (req.body.email) {
-            // let data = await mailTrigger(req.body.subUsername, req.body.password, req.body.email, req.body.company_name, 0)
-            // if (data) {
+            let data = await mailTrigger(req.body.subUsername, req.body.password, req.body.email, req.body.companyName, 1)
+            if (data) {
               res.json({
                 statusCode: res.statusCode,
                 success: true,
                 message: "subUser Created Successfully",
                 // user: createdata
               });
-            // }
+            }
           } else {
-            // let mobiledata = await MobileTrigger(req.body.phone, req.body.password, req.body.company_name, 0)
-            // if (mobiledata) {
+            let mobiledata = await MobileTrigger(req.body.subUsername, req.body.phone, req.body.password, req.body.companyName, 1)
+            if (mobiledata) {
               res.json({
                 statusCode: res.statusCode,
                 success: true,
                 message: "subUser Created Successfully",
                 // user: createdata
               });
-            // }
+            }
           }
         }
       }
     }
 
   } catch (error) {
+    console.log('error------------------>', error)
     res.json({
       statusCode: res.statusCode,
       success: false,
@@ -2118,6 +1748,7 @@ async function mailTrigger(userName, Passwrd, email, companyName, type) {
     //   path.resolve(__dirname, "../template/SubUser.html"),
     //   "utf8"
     // );
+    console.log('iam here working')
     var html;
     var replacements = {
       userName: userName,
@@ -2141,41 +1772,51 @@ async function mailTrigger(userName, Passwrd, email, companyName, type) {
 
     var htmlToSend = template(replacements);
     let userMailName = userName;
-    let mailotpTrigger1 = await mailotpTrigger.otpmailTrigger(data.email, htmlToSend, userMailName, 0)
+    let mailotpTrigger1 = await mailotpTrigger.otpmailTrigger(email, htmlToSend, userMailName, 0)
+    console.log('mailotpTrigger1------>', mailotpTrigger1)
+    if (mailotpTrigger1) {
+      resolve('success')
+    } else {
+      resolve('failure')
+    }
   })
 }
 
-// async function MobileTrigger(phone, passwrd) {
-//   return new Promise((resolve, reject) => {
-//     let url = Constant.smsurl;
-//     let urlwithnumber = url.concat(phone);
-//     let v1 = urlwithnumber.concat("&template_id=");
-//     let v2 = v1.concat(Constant.verficationotpid);
-//     let v3 = urlwithnumber.concat("&message=");
-//     let v4 = v3.concat(Constant.verficationotpmsgtxt1);
-//     let v5 = v4.concat(passwrd);
-//     let msg = v5; //.concat(Constant.verficationotpmsgtxt2);
-//     //let msg='Your GST account mobile verification code is'+ otp +'Team CYBERNETIC SYSTEMS';
-//     console.log("smstemplate", msg);
-//     //let lasturl=data.concat(msg);
-//     axios
-//       .get(msg)
-//       .then(function (response) {
-//         // handle success
-//         console.log('response from sms----->', response);
-//       })
-//       .catch(function (error) {
-//         // handle error
-//         console.log(error);
-//         console.log("error");
-//       })
-//       .then(function () {
-//         // always executed
-//         console.log("always");
-//       });
+async function MobileTrigger(userName, phone, passwrd, companyName, type) {
+  return new Promise((resolve, reject) => {
+    let url = Constant.smsurl;
+    let urlwithnumber = url.concat(phone);//phno            
+    let v3 = urlwithnumber.concat("&message=");
+    let userName = updatedata.dataValues.name;
+    // let msg1 = `Dear ${userName}, ${data.sms_otp} is the OTP to verify your mobile number.%nRegards,%nTeam, Intellinvest Pvt. Ltd.`
+    // console.log('msg1----------->', msg1)
+    // let v4 = v3.concat(msg1)
+    // console.log('v4------------------->', v4)
+    // let msg = v4;
+    var msg;
+    if (type == 0) {
+      msg = `You are invited to be an SubUser by ${userName} for the company  ${companyName} in My Accounts App.To Login My Accounts App Kindly Use the click Login below.https://vikramapp.colanapps.in/#/login`
+    } else {
+      msg = `You are invited to be an SubUser by ${userName} for the company ${companyName} in My Accounts App.Use this password to Login My Accounts App ${passwrd}.To Login My Accounts App Kindly Use the click Login below.https://vikramapp.colanapps.in/#/login`
+    }
+    axios
+      .get(msg)
+      .then(function (response) {
+        // handle success
+        console.log('response from sms----->', response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+        console.log("error");
+      })
+      .then(function () {
+        // always executed
+        console.log("always");
+      });
 
-//   })
-// }
+  })
+}
 // for user and subUser
 exports.checkingExistUser = async function (req, res) {
   try {

@@ -18,15 +18,15 @@ import Sequelize from 'sequelize';
 //   timezone: '+05:30'
 // });
 
-export const sequelize =  new Sequelize('vikram', 'root', 'root', {
+export const sequelize = new Sequelize('vikram', 'root', 'root', {
   // host: "127.0.0.1",
-  host:"localhost",
+  host: "localhost",
   dialect: 'mysql',
   // login:false,
   // logging: false,
-  define:{
-    "timestamps":false,
-    freezeTableName:true,
+  define: {
+    "timestamps": false,
+    freezeTableName: true,
     "underscored": true,
   },
   dialectOptions: {
@@ -34,6 +34,7 @@ export const sequelize =  new Sequelize('vikram', 'root', 'root', {
   },
   timezone: '+05:30'
 });
+
 
 
 // export const sequelize =  new Sequelize('db_a4d967_account', 'a4d967_account', 'Account@2020', {
@@ -54,13 +55,13 @@ export const sequelize =  new Sequelize('vikram', 'root', 'root', {
 sequelize.authenticate()
   .then(() => {
     console.log('Connection has been established successfully.');
-    sequelize.sync().then(()=>{
+    sequelize.sync().then(() => {
       console.log('connected models')
-    }).catch((err)=>{
-console.log('couldnot create models',err)
+    }).catch((err) => {
+      console.log('couldnot create models', err)
     })
   })
   .catch(err => {
     console.error('Unable to connect to the database:', err);
-});
+  });
 

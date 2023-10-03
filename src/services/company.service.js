@@ -27,7 +27,6 @@ import DebitVoucher from "../models/debitVoucher";
 import PurchaseVoucher from "../models/purchaseVoucher";
 import Item from "../models/items";
 import addSubusers from "../models/addsubusers";
-import compUserSubUserTrack from "../models/userSubUsertrack"
 
 exports.getSingleData = async function (id, data, res) {
   try {
@@ -70,373 +69,90 @@ exports.getSingleData = async function (id, data, res) {
   }
 };
 
-//user and subuser before
-// exports.getAllData = async function (data, res) {
-//   try {
-//     var findMainUser;
-//     // if (data.data.subUserId) {by me
-//     if (data.subUser_id) {
-//       findMainUser = await addSubusers.findAll({
-//         where: {
-//           sub_user_id: data.subUser_id, is_Invited: 'Yes'
-//         }
-//       }).map((node) => node.get({
-//         plain: true
-//       }));
-//       let filter = {}
-//       filter.where = {}
-//       if (findMainUser != '' || findMainUser != null || findMainUser != undefined) {
-//         filter.where = {
-//           [Op.or]: [
-//             { user_id: data.uid },
-//             { uid: findMainUser[0].company_id }
-//           ]
-//         }
-//       } else {
-//         filter.where.user_id = data.uid;
-//       }
-//       filter.include = [
-//         {
-//           model: City,
-//           attributes: ["name"],
-//           include: [
-//             {
-//               model: State,
-//               attributes: ["name"]
-//             }
-//           ]
-//         }, {
-//           model: Entries
-//         }
-//       ]
-//       filter.order = [['id', 'ASC']]
-//       console.log('filter--->', filter)
-//       let testData = await Company.findAll(filter).then(async (resp) => {
-//         if (resp.length > 0) {
-//           let checkset = [...new Set(resp.map(x => x.user_id))]
-//           let arr = []
-//           for (let i = 0; i < checkset.length; i++) {
-//             let userEmailFind = await User.findOne({
-//               where: {
-//                 uid: checkset[i]
-//               },
-//               attributes: ['email']
-//             })
-//             let resp1 = resp.filter((item) => item.user_id == checkset[i])
-//             let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
-//             await response.forEach(async (element) => {
-//               // let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.data.email } }); byme
-//               let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.email } });
-//               if (ledgerbody3) {
-//                 let find = await Ledger.findOne({ where: { name: ledgerbody3.name, company_id: ledgerbody3.company_id } });
-//                 if (!find) {
-//                   Ledger.create(ledgerbody3);
-//                 }
-//               }
-//             });
-//             arr.push(response)
-//           }
-//           res.json({
-//             statusCode: res.statusCode,
-//             success: true,
-//             message: "Company fetch Successfully",
-//             company: arr
-//           })
-//         } else {
-//           return {
-//             statusCode: res.statusCode,
-//             success: true,
-//             message: "Company not Found!",
-//             company: resp ? resp : []
-//           };
-//         }
-//         // if (resp.length > 0) {
-//         //   let response = await decreption(resp, "array", data.email);
-//         //   // console.log('response--->',response)
-//         //   await response.forEach(async (element) => {
-//         //     // let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.data.email } });
-//         //     let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.email } });
+exports.getAllData = async function(data, res) {
+  try {
+    let createdata = await Company.findAll({
+      where: {
+        user_id: data.data.uid
+      },
+      include: [
+        {
+          model: City,
+          attributes: ["name"],
+          include: [
+            {
+              model: State,
+              attributes: ["name"]
+            }
+          ]
+        },{
+          model:Entries
+        }
+      ],order: [
+        ['id', 'ASC']
+      ]
+    }).map((node) => node.get({
+        plain: true
+    }));
+    if (createdata.length > 0) {
+      console.log('createdata',createdata);
+      console.log('email',data.data.email);
+      let response = await decreption(createdata, "array", data.data.email);
+      await response.forEach(async(element) => {
+        let ledgerbody3 =await encreption({uid:uniqid(),name:'Round Off',company_id:element.uid,account_group_id:Constant.indirect_Expenses_id,opening_balance:'debit',registration_type:'Regular', status:1,period_start:element.current_period_start,period_end :element.current_period_end,cess:false,amount:'0',data:{email:data.data.email} });
+        if(ledgerbody3){
+          let find = await Ledger.findOne({where:{name:ledgerbody3.name, company_id:ledgerbody3.company_id}});
+          if(!find){
+            Ledger.create(ledgerbody3);
+          }
+        }
+      });
+      // for (let index = 0; index < response.length; index++) {
+      //   let ledgerbody3 =await encreption({uid:uniqid(),name:'Round Off',company_id:response[index].uid,account_group_id:Constant.indirect_Expenses_id,opening_balance:'credit',registration_type:'Regular', status:1,period_start:response[index].current_period_start,period_end :response[index].current_period_end,cess:false,amount:'0',data:{email:data.data.email} });
 
-//         //     if (ledgerbody3) {
-//         //       console.log('iam hererr------->')
-//         //       let find = await Ledger.findOne({ where: { name: ledgerbody3.name, company_id: ledgerbody3.company_id } });
-//         //       if (!find) {
-//         //         console.log('iam creating------->')
+      //   console.log("ledgerbody3", ledgerbody3)
 
-//         //         Ledger.create(ledgerbody3);
-//         //       }
-//         //     }
-//         //   });
-//         //   res.json({
-//         //     statusCode: res.statusCode,
-//         //     success: true,
-//         //     message: "Company fetch Successfully",
-//         //     company: response
-//         //   })
-//         // } else {
-//         //   return {
-//         //     statusCode: res.statusCode,
-//         //     success: true,
-//         //     message: "Company not Found!",
-//         //     company: resp ? resp : []
-//         //   };
-//         // }
-//       })
-//     } else {
-//       //mainUsers Login Scenario
-//       let findSubUsers = await addSubusers.findAll({
-//         where: {
-//           userid_gen: data.uid, is_Invited: 'Yes'
-//         }
-//       }).map((node) => node.get({
-//         plain: true
-//       }));
-//       if (findSubUsers.length > 0) {
-//         let subUserComp = findSubUsers.map((user) => user.company_id)
-//         let filter = {}
-//         filter.where = {}
-//         filter.where = {
-//           [Op.or]: [
-//             { user_id: data.uid },
-//             { uid: subUserComp }
-//           ]
-//         }
-//         await Company.findAll(filter).then(async (resp) => {
-//           if (resp.length > 0) {
-//             let checkset = [...new Set(resp.map(x => x.user_id))]
-//             let arr = []
-//             for (let i = 0; i < checkset.length; i++) {
-//               let userEmailFind = await User.findOne({
-//                 where: {
-//                   uid: checkset[i]
-//                 },
-//                 attributes: ['email']
-//               })
-//               let resp1 = resp.filter((item) => item.user_id == checkset[i])
-//               let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
-//               arr.push(response)
-//             }
-//             res.json({
-//               statusCode: res.statusCode,
-//               success: true,
-//               message: "Company fetch Successfully",
-//               company: arr
-//             })
-//           } else {
-//             return {
-//               statusCode: res.statusCode,
-//               success: true,
-//               message: "Company not Found!",
-//               company: resp ? resp : []
-//             };
-//           }
-//           // if (resp.length > 0) {
-//           //   let response = await decreption(resp, "array", data.email);
-//           // console.log('response--->',response)
-//           // await response.forEach(async (element) => {
-//           //   // let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.data.email } });
-//           //   let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.email } });
+      //   if(ledgerbody3){
+      //     let find = await Ledger.findOne({where:{name:ledgerbody3.name, company_id:ledgerbody3.company_id}});
+      //     if(!find){
+      //       Ledger.create(ledgerbody3);
+      //     }
+      //   }
+      //   if(index==response.length-1){
+         
+      //   }
+      // }
+      return {
+        statusCode: res.statusCode,
+        success: true,
+        message: "Company fetch Successfully",
+        company: response
+      };
 
-//           //   if (ledgerbody3) {
-//           //     console.log('iam hererr------->')
-//           //     let find = await Ledger.findOne({ where: { name: ledgerbody3.name, company_id: ledgerbody3.company_id } });
-//           //     if (!find) {
-//           //       console.log('iam creating------->')
-
-//           //       Ledger.create(ledgerbody3);
-//           //     }
-//           //   }
-//           // });
-//           // res.json({
-//           //   statusCode: res.statusCode,
-//           //   success: true,
-//           //   message: "Company fetch Successfully",
-//           //   company: response
-//           // })
-//           // }
-//         })
-//       } else {
-//         let createdata = await Company.findAll({
-//           where: {
-//             // user_id: data.data.uid
-//             user_id: data.uid
-//           },
-//           include: [
-//             {
-//               model: City,
-//               attributes: ["name"],
-//               include: [
-//                 {
-//                   model: State,
-//                   attributes: ["name"]
-//                 }
-//               ]
-//             }, {
-//               model: Entries
-//             }
-//           ], order: [
-//             ['id', 'ASC']
-//           ]
-//         }).map((node) => node.get({
-//           plain: true
-//         }));
-//         if (createdata.length > 0) {
-//           // console.log('createdata', createdata);
-//           // /console.log('email',data.data.email);
-//           // let response = await decreption(createdata, "array", data.data.email); byme
-//           let response = await decreption(createdata, "array", data.email);
-
-//           await response.forEach(async (element) => {
-//             // let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.data.email } });byme
-//             let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.email } });
-
-//             if (ledgerbody3) {
-
-//               let find = await Ledger.findOne({ where: { name: ledgerbody3.name, company_id: ledgerbody3.company_id } });
-//               if (!find) {
-
-//                 Ledger.create(ledgerbody3);
-//               }
-//             }
-//           });
-//           // for (let index = 0; index < response.length; index++) {
-//           //   let ledgerbody3 =await encreption({uid:uniqid(),name:'Round Off',company_id:response[index].uid,account_group_id:Constant.indirect_Expenses_id,opening_balance:'credit',registration_type:'Regular', status:1,period_start:response[index].current_period_start,period_end :response[index].current_period_end,cess:false,amount:'0',data:{email:data.data.email} });
-
-//           //   console.log("ledgerbody3", ledgerbody3)
-
-//           //   if(ledgerbody3){
-//           //     let find = await Ledger.findOne({where:{name:ledgerbody3.name, company_id:ledgerbody3.company_id}});
-//           //     if(!find){
-//           //       Ledger.create(ledgerbody3);
-//           //     }
-//           //   }
-//           //   if(index==response.length-1){
-
-//           //   }
-//           // }
-//           return {
-//             statusCode: res.statusCode,
-//             success: true,
-//             message: "Company fetch Successfully",
-//             company: response
-//           };
-
-//         } else {
-//           return {
-//             statusCode: res.statusCode,
-//             success: true,
-//             message: "Company not Found!",
-//             company: createdata ? createdata : []
-//           };
-//         }
-//       }
-//     }
-//   } catch (e) {
-//     console.log(e)
-//     return {
-//       statusCode: await checkCode("error"),
-//       success: false,
-//       error: e.message,
-//       message: "Something went wrong!"
-//     };
-//   }
-// };
-//user and subuser now
-// exports.getAllData = async function (data, res) {
-//   try {
-//     if (data.companyList.length != 0) {
-//       await Company.findAll({
-//         where: {
-//           [Op.or]: [
-//             { user_id: data.uid },
-//             { uid: data.companyList.company_id}
-//           ]
-//         }
-//       })
-//     } else {
-//       let createdata = await Company.findAll({
-//         where: {
-//           user_id: data.data.uid,
-//         },
-//         include: [
-//           {
-//             model: City,
-//             attributes: ["name"],
-//             include: [
-//               {
-//                 model: State,
-//                 attributes: ["name"]
-//               }
-//             ]
-//           }, {
-//             model: Entries
-//           }
-//         ], order: [
-//           ['id', 'ASC']
-//         ]
-//       }).map((node) => node.get({
-//         plain: true
-//       }));
-//       if (createdata.length > 0) {
-//         console.log('createdata', createdata);
-//         console.log('email', data.data.email);
-//         let response = await decreption(createdata, "array", data.data.email);
-//         await response.forEach(async (element) => {
-//           let ledgerbody3 = await encreption({ uid: uniqid(), name: 'Round Off', company_id: element.uid, account_group_id: Constant.indirect_Expenses_id, opening_balance: 'debit', registration_type: 'Regular', status: 1, period_start: element.current_period_start, period_end: element.current_period_end, cess: false, amount: '0', data: { email: data.data.email } });
-//           if (ledgerbody3) {
-//             let find = await Ledger.findOne({ where: { name: ledgerbody3.name, company_id: ledgerbody3.company_id } });
-//             if (!find) {
-//               Ledger.create(ledgerbody3);
-//             }
-//           }
-//         });
-//         // for (let index = 0; index < response.length; index++) {
-//         //   let ledgerbody3 =await encreption({uid:uniqid(),name:'Round Off',company_id:response[index].uid,account_group_id:Constant.indirect_Expenses_id,opening_balance:'credit',registration_type:'Regular', status:1,period_start:response[index].current_period_start,period_end :response[index].current_period_end,cess:false,amount:'0',data:{email:data.data.email} });
-
-//         //   console.log("ledgerbody3", ledgerbody3)
-
-//         //   if(ledgerbody3){
-//         //     let find = await Ledger.findOne({where:{name:ledgerbody3.name, company_id:ledgerbody3.company_id}});
-//         //     if(!find){
-//         //       Ledger.create(ledgerbody3);
-//         //     }
-//         //   }
-//         //   if(index==response.length-1){
-
-//         //   }
-//         // }
-//         return {
-//           statusCode: res.statusCode,
-//           success: true,
-//           message: "Company fetch Successfully",
-//           company: response
-//         };
-
-//       } else {
-//         return {
-//           statusCode: res.statusCode,
-//           success: true,
-//           message: "Company not Found!",
-//           company: createdata ? createdata : []
-//         };
-//       }
-//     }
-//   } catch (e) {
-//     console.log(e)
-//     return {
-//       statusCode: await checkCode("error"),
-//       success: false,
-//       error: e.message,
-//       message: "Something went wrong!"
-//     };
-//   }
-// };
-
+    } else {
+      return {
+        statusCode: res.statusCode,
+        success: true,
+        message: "Company not Found!",
+        company: createdata ? createdata : []
+      };
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      statusCode: await checkCode("error"),
+      success: false,
+      error: e.message,
+      message: "Something went wrong!"
+    };
+  }
+};
 exports.getAllData = async function (data, res) {
   try {
     let checksubUsers = await addSubusers.findAll({
       where: {
-        sub_user_id: data.uid
+        // sub_user_id: data.uid
+        sub_user_id: data.data.uid
       }
     })
     console.log('checksubUsers-------------------->', checksubUsers)
@@ -450,13 +166,15 @@ exports.getAllData = async function (data, res) {
      
       filter.where={
         [Op.or]: {
-          user_id: data.uid,
+          // user_id: data.uid,
+          user_id:  data.data.uid,
           uid: companyId
         }
       }
     }else{
-      filter.where.user_id=data.uid
+      // filter.where.user_id=data.uid
 
+      filter.where.user_id=data.data.uid
     }
     filter.include=[
       {
@@ -529,11 +247,23 @@ exports.getAllData = async function (data, res) {
         });
         arr.push(response)
       }
+      let flatArray = arr.reduce((acc, curVal) => {
+        return acc.concat(curVal)
+    }, []);
+    // console.log('faltarray----------->',flatArray)
+    let roleadd=flatArray.filter((value,index,arr)=>{
+      if(value.user_id==data.data.uid){
+          value['role']='Admin'
+      }else{
+          value['role']='Subuser'
+      }
+      return flatArray
+      })
       res.json({
         statusCode: res.statusCode,
         success: true,
         message: "Company fetch Successfully",
-        company: arr
+        company: roleadd
       })
 
 
@@ -579,7 +309,7 @@ exports.getAllData = async function (data, res) {
         statusCode: res.statusCode,
         success: true,
         message: "Company not Found!",
-        company: createdata ? createdata : []
+        company: resp ? resp : []
       };
     }
   } catch (e) {
@@ -681,7 +411,7 @@ exports.createData = async function (data, res) {
   try {
     if (new Date() >= new Date(data.financial_year)) {
       // data.user_id = data.data.uid;byme
-      data.user_id = data.uid;
+      // data.user_id = data.uid;
 
       let checkdata = await Company.findOne({
         // where: { company_name: data.company_name, user_id: data.data.uid } byme
@@ -720,9 +450,9 @@ exports.createData = async function (data, res) {
         data.current_period_start = finaldatestart;
         data.current_period_end = finaldateend;
         data.bookstart_date = data.financial_year;
-        data.role = 'Admin';
+        // data.role = 'Admin';
         let createdata = await Company.create(data)
-        console.log('createddata------>', createdata)
+        // console.log('createddata------>', createdata)
         let userData = await User.findOne({ where: { uid: data.user_id } })
         // let filter = {
         //   cid: createdata.uid,

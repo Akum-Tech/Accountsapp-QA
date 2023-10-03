@@ -89,5 +89,7 @@ const addSubusers = sequelize.define('addsubusers', {
     }
 
 })
-
+sequelize.sync(()=>{
+    console.log('sequelize table createed')
+})
 export default addSubusers;

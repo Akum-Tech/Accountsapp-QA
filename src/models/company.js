@@ -101,9 +101,9 @@ const Company =  sequelize.define('companies', {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
     },
-    role:{
-        type: Sequelize.STRING
-    },
+    // role:{
+    //     type: Sequelize.STRING
+    // },
     subscription_end_date:{
         type: Sequelize.DATE,
         default:''
