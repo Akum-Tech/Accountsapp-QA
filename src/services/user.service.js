@@ -75,7 +75,6 @@ exports.getSingleData = async function (id, data, res) {
 
       createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
       createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-      console.log("resp----->", createdata.dataValues);
       return {
         statusCode: res.statusCode,
         success: true,
@@ -100,148 +99,6 @@ exports.getSingleData = async function (id, data, res) {
     };
   }
 };
-
-
-// exports.getSingleData = async function (id, data, res) {
-//   try {
-//     let createdata = await User.findOne({
-//       where: {
-//         uid: id
-//       }
-//     });
-//     if (createdata) {
-//       var findMainUser;
-//       if (data.subUser_id) {
-//         findMainUser = await addSubusers.findAll({
-//           where: {
-//             sub_user_id: data.subUser_id, is_Invited: 'Yes'
-//           }
-//         }).map((node) => node.get({
-//           plain: true
-//         }));
-//         let filter = {}
-//         filter.where = {}
-//         if (findMainUser != '' || findMainUser != null || findMainUser != undefined) {
-//           filter.where = {
-//             [Op.or]: [
-//               { user_id: data.uid },
-//               { uid: findMainUser[0].company_id }
-//             ]
-//           }
-//         } else {
-//           filter.where.user_id = data.uid;
-//         }
-//         let countcomapny = await Company.findAll(filter)
-//           .then(async (resp) => {
-//             if (resp.length > 0) {
-//               let checkset = [...new Set(resp.map(x => x.user_id))]
-//               let arr = []
-//               for (let i = 0; i < checkset.length; i++) {
-//                 let userEmailFind = await User.findOne({
-//                   where: {
-//                     uid: checkset[i]
-//                   },
-//                   attributes: ['email']
-//                 })
-//                 let resp1 = resp.filter((item) => item.user_id == checkset[i])
-//                 let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
-//                 arr.push(response)
-//               }
-//               createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-//               createdata.dataValues.companyList = arr
-//             }
-//           })
-//         // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-//         // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);
-//       } else {
-//         //mainUsers Login Scenario
-//         let findSubUsers = await addSubusers.findAll({
-//           where: {
-//             mainuser_id: data.uid, is_Invited: 'Yes'
-//           }
-//         }).map((node) => node.get({
-//           plain: true
-//         }));
-//         console.log('findSubUsers---->', findSubUsers)
-//         if (findSubUsers.length > 0) {
-//           let subUserComp = findSubUsers.map((user) => user.company_id)
-//           console.log('mainuser--->', mainUser)
-//           let filter = {}
-//           filter.where = {}
-//           filter.where = {
-//             [Op.or]: [
-//               { user_id: data.uid },
-//               { uid: subUserComp }
-//             ]
-//           }
-//           let countcomapny = await Company.findAll(filter).then(async (resp) => {
-//             if (resp.length > 0) {
-//               let checkset = [...new Set(resp.map(x => x.user_id))]
-//               console.log('check set---->', checkset)
-//               let arr = []
-//               for (let i = 0; i < checkset.length; i++) {
-//                 let userEmailFind = await User.findOne({
-//                   where: {
-//                     uid: checkset[i]
-//                   },
-//                   attributes: ['email']
-//                 })
-//                 let resp1 = resp.filter((item) => item.user_id == checkset[i])
-//                 let response = await decreption(resp1, "array", userEmailFind.dataValues.email);
-//                 arr.push(response)
-//               }
-//               createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-//               createdata.dataValues.companyList = arr
-//             }
-//           })
-//           // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-//           // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-//         } else {
-//           //mainuser donthave any subuser login scenario
-//           let countcomapny = await Company.findAll({
-//             where: {
-//               user_id: createdata.dataValues.uid
-//             }
-//           });
-
-//           createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-//           createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-//           console.log("resp----->", createdata.dataValues);
-//         }
-//       }
-//       // let countcomapny = await Company.findAll({
-//       //   where: {
-//       //     user_id: createdata.dataValues.uid
-//       //   }
-//       // });
-
-//       // createdata.dataValues.serverdate = new Date().toISOString().slice(0, 10);
-//       // createdata.dataValues.companyList = await decreption(countcomapny, "array", createdata.dataValues.email);;
-//       // console.log("resp----->", createdata.dataValues);
-//       return {
-//         statusCode: res.statusCode,
-//         success: true,
-//         message: "User fetch Successfully",
-//         user: createdata
-//       };
-//     } else {
-//       return {
-//         statusCode: res.statusCode,
-//         success: true,
-//         message: "User not Found!",
-//         user: createdata ? createdata : {}
-//       };
-//     }
-//   } catch (e) {
-//     console.log(e)
-//     return {
-//       statusCode: await checkCode("error"),
-//       success: false,
-//       error: e,
-//       message: "Something went wrong!"
-//     };
-//   }
-// };
 
 exports.getAllData = async function (data, res) {
   try {
@@ -509,7 +366,6 @@ exports.createData = async function (data, res) {
 async function createUser(data) {
   return new Promise(async (resolve, reject) => {
     data.uid = await uniqid();
-    console.log('iam working----->', data)
     data.creation_date = new Date();
     data.updated_date = new Date();
     data.status = 1;
@@ -520,7 +376,6 @@ async function createUser(data) {
     if (data.phone != '') {
       data.is_mobile_verify = 0;
     }
-    console.log('data in create---->', data)
     let createdata = await User.create(data);
     if (createdata) {
       let token = await jwt.sign(
@@ -553,10 +408,9 @@ async function createUser(data) {
         let v3 = urlwithnumber.concat("&message=");
         let userName = createdata.dataValues.name;
         let msg1 = `Dear ${userName}, ${data.sms_otp} is the OTP to verify your mobile number.%nRegards,%nTeam, Intellinvest Pvt. Ltd.`
-        console.log('msg1----------->', msg1)
         let v4 = v3.concat(msg1)
-        console.log('v4------------------->', v4)
         let msg = v4;
+        console.log('msg------------>', msg)
         axios
           .get(msg)
           .then(function (response) {
@@ -579,11 +433,8 @@ async function createUser(data) {
         };
         var htmlToSend = template(replacements);
         let userMailName = createdata.dataValues.name;
-        console.log('htmlToSend_------>', htmlToSend)
-
         let mailotpTrigger1 = await mailotpTrigger.otpmailTrigger(data.email, htmlToSend, userMailName, 0)
       }
-      console.log('created data in resolve------>', createdata)
       resolve(createdata)
     }
   })
@@ -739,18 +590,13 @@ exports.loginUser = async function (data, res) {
       }
     });
     if (finddata) {
-      console.log('sha1(data.password)----->', sha1(data.password))
-      console.log('finddata.password------>', finddata.password)
       if (sha1(data.password) === finddata.password) {
         if (data.email != undefined) {
-          console.log('data workingmail', typeof (data.email))
-
           if (finddata.dataValues.is_email_verify == 0) {
             data.email_otp = emailotp;
           }
         }
         if (data.phone != undefined) {
-          console.log('data working', data.phone)
           if (finddata.dataValues.is_mobile_verify == 0) {
             data.sms_otp = smsotp;
           }
@@ -791,13 +637,9 @@ exports.loginUser = async function (data, res) {
               let v3 = urlwithnumber.concat("&message=");
               let userName = updatedata.dataValues.name;
               let msg1 = `Dear ${userName}, ${data.sms_otp} is the OTP to verify your mobile number.%nRegards,%nTeam, Intellinvest Pvt. Ltd.`
-              console.log('msg1----------->', msg1)
               let v4 = v3.concat(msg1)
-              console.log('v4------------------->', v4)
               let msg = v4;
-
               console.log("smstemplate inlogin------------------->", msg);
-
               axios
                 .get(msg)
                 .then(function (response) {
@@ -1320,294 +1162,6 @@ exports.changeUserDetails = async function (req, res) {
     };
   }
 }
-//before user and subuser at user level
-// exports.addSubUser = async function (req, res) {
-//   try {
-//     console.log(req.body);
-//     let emailotp = otpGenerator.generate(6, {
-//       alphabets: false,
-//       upperCase: false,
-//       specialChars: false
-//     });
-//     let smsotp = otpGenerator.generate(6, {
-//       alphabets: false,
-//       upperCase: false,
-//       specialChars: false
-//     });
-
-//     let companyNameFind = await Company.findOne({
-//       where: {
-//         uid: req.body.company_id
-//       },
-//     })
-//     if (req.body.subUser_id != '') {
-//       let findsubUserdata = await addSubusers.findOne({
-//         where: {
-//           sub_user_id: req.body.subUser_id
-//         }
-//       })
-//       let findmainUserData = await User.findOne({
-//         where: {
-//           uid: findsubUserdata.dataValues.mainuser_id,
-//           [Op.or]: [
-//             req.body.email ? { email: req.body.email } : null,
-//             req.body.phone ? { phone: req.body.phone } : null
-//           ]
-//         }
-//       })
-//       let obj = {
-//         mainuser_id: req.body.user_id,//subuser becomes main user so save the userid
-//         mainuserName: req.body.userName,//subuser name
-//         mainuserEmail: req.body.main_user_email,
-//         mainuserMobile: req.body.main_user_mobile,
-//         userid_gen: findmainUserData.dataValues.uid,//admin userid
-//         subUser_id: uniqid(),
-//         subUsername: req.body.subUsername,//admin name
-//         email: req.body.email,//admin mail
-//         phone: req.body.phone,
-//         company_name: companyNameFind.dataValues.company_name,
-//         company_id: req.body.company_id,
-//         is_Invited: 'Yes'
-//       }
-//       let createmainUserAssubUser = await addSubusers.create(obj)
-//       let filter = {
-//         cid: req.body.company_id,
-//         company_name: companyNameFind.dataValues.company_name,
-//         main_user_id: req.body.user_id,
-//         main_user_name: req.body.userName,
-//         mainuser_email: req.body.main_user_email,
-//         mainuser_mobile: req.body.main_user_mobile,
-//         subUser_email: req.body.email,
-//         subUser_mobile: req.body.phone,
-//         subUsergen_id: findsubUserdata.dataValues.userid_gen,
-//         subUserId: findsubUserdata.dataValues.sub_user_id,
-//         isSubuserInviteAdmin: 'Yes',
-//         isAdminInvitedSubUser: '',
-//         is_editable: 'No',
-//         is_viewable: 'Yes',
-//         Role: 'SubUser',
-//         status: 'SubUser Invites admin as Subuser'
-//       }
-
-//       let createtrack = await compUserSubUserTrack.create(filter).then(async (response) => {
-//         if (req.body.email) {
-//           let data = await mailTrigger(req.body.userName, req.body.password, req.body.email, req.body.company_name, 0)
-//           if (data) {
-//             res.json({
-//               statusCode: res.statusCode,
-//               success: true,
-//               message: "subUser Created Successfully",
-//               // user: createdata
-//             });
-//           }
-//         } else {
-//           let mobiledata = await MobileTrigger(req.body.phone, req.body.password, req.body.company_name, 0)
-//           if (mobiledata) {
-//             res.json({
-//               statusCode: res.statusCode,
-//               success: true,
-//               message: "subUser Created Successfully",
-//               // user: createdata
-//             });
-//           }
-//         }
-//       })
-//     } else {
-//       //logic
-//       let checkSubUserdata = await addSubusers.findOne({
-//         where: {
-//           [Op.or]: [
-//             req.body.email ? { email: req.body.email } : null,
-//             req.body.phone ? { phone: req.body.phone } : null
-//           ]
-//         }
-//       }).then(async (data) => {
-//         if (data == null) {
-//           let existingUsersFind = await User.findOne({
-//             where: {
-//               [Op.or]: [
-//                 req.body.email ? { email: req.body.email } : null,
-//                 req.body.phone ? { phone: req.body.phone } : null
-//               ]
-//             }
-//           })
-//           if (existingUsersFind) {
-//             let obj = {
-//               mainuser_id: req.body.user_id,
-//               mainuserName: req.body.userName,
-//               mainuserEmail: req.body.main_user_email,
-//               mainuserMobile: req.body.main_user_mobile,
-//               userid_gen: existingUsersFind.dataValues.uid,
-//               subUser_id: uniqid(),
-//               subUsername: req.body.subUsername,
-//               email: req.body.email,
-//               phone: req.body.phone,
-//               company_name: companyNameFind.dataValues.company_name,
-//               company_id: req.body.company_id,
-//               is_Invited: 'Yes'
-//             }
-//             let creatSubUser = await addSubusers.create(obj).then(async (create) => {
-//               let filter = {
-//                 cid: req.body.company_id,
-//                 company_name: companyNameFind.dataValues.company_name,
-//                 main_user_id: req.body.user_id,
-//                 main_user_name: req.body.userName,
-//                 mainuser_email: req.body.main_user_email,
-//                 mainuser_mobile: req.body.main_user_mobile,
-//                 subUser_email: req.body.email,
-//                 subUser_mobile: req.body.phone,
-//                 subUsergen_id: existingUsersFind.dataValues.uid,
-//                 subUserId: create.dataValues.subUser_id,
-//                 isSubuserInviteAdmin: '',
-//                 isAdminInvitedSubUser: 'Yes',
-//                 is_editable: 'No',
-//                 is_viewable: 'Yes',
-//                 Role: 'SubUser',
-//                 status: 'Exist user Invities'
-//               }
-
-
-//               let createtrack = await compUserSubUserTrack.create(filter).then(async (resp) => {
-//                 if (req.body.email) {
-//                   let data = await mailTrigger(req.body.userName, req.body.password, req.body.email, req.body.company_name, 0)
-//                   if (data) {
-//                     res.json({
-//                       statusCode: res.statusCode,
-//                       success: true,
-//                       message: "subUser Created Successfully",
-//                       // user: createdata
-//                     });
-//                   }
-//                 } else {
-//                   let mobiledata = await MobileTrigger(req.body.phone, req.body.password, req.body.company_name, 0)
-//                   if (mobiledata) {
-//                     res.json({
-//                       statusCode: res.statusCode,
-//                       success: true,
-//                       message: "subUser Created Successfully",
-//                       // user: createdata
-//                     });
-//                   }
-//                 }
-//               })
-//             })
-//           } else {
-//             let checkuser = await addSubusers.findOne({
-//               where: {
-//                 [Op.or]: [
-//                   req.body.email ? { email: req.body.email } : null,
-//                   req.body.phone ? { phone: req.body.phone } : null
-//                 ]
-//               }
-//             }).then(async (check) => {
-//               console.log("colan test" + check)
-//               if (check === null) {
-//                 console.log('iam here1')
-//                 let data = {}
-//                 data.uid = await uniqid();
-//                 data.name = req.body.subUsername;
-//                 data.email = req.body.email;
-//                 data.phone = req.body.phone;
-//                 data.creation_date = new Date();
-//                 data.updated_date = new Date();
-//                 data.status = 1;
-//                 data.email_otp = emailotp;
-//                 data.sms_otp = smsotp;
-//                 data.is_email_verify = 0;
-//                 data.is_mobile_verify = 0;
-//                 data.application_type = req.body.application_type
-//                 data.password = await sha1(req.body.password);
-//                 let createdata = await User.create(data);
-//                 if (createdata) {
-//                   let obj = {
-//                     mainuser_id: req.body.user_id,
-//                     mainuserName: req.body.userName,
-//                     mainuserEmail: req.body.main_user_email,
-//                     mainuserMobile: req.body.main_user_mobile,
-//                     userid_gen: createdata.uid,
-//                     subUser_id: uniqid(),
-//                     subUsername: req.body.subUsername,
-//                     email: req.body.email,
-//                     phone: req.body.phone,
-//                     company_name: companyNameFind.dataValues.company_name,
-//                     company_id: req.body.company_id,
-//                     is_Invited: 'Yes'
-//                   }
-
-
-//                   let creatSubUser = await addSubusers.create(obj)
-//                   let filter = {
-//                     cid: req.body.company_id,
-//                     company_name: companyNameFind.dataValues.company_name,
-//                     main_user_id: req.body.user_id,
-//                     main_user_name: req.body.userName,
-//                     mainuser_email: req.body.main_user_email,
-//                     mainuser_mobile: req.body.main_user_mobile,
-//                     subUser_email: req.body.email,
-//                     subUser_mobile: req.body.phone,
-//                     subUsergen_id: creatSubUser.dataValues.userid_gen,
-//                     subUserId: creatSubUser.dataValues.sub_user_id,
-//                     isSubuserInviteAdmin: '',
-//                     isAdminInvitedSubUser: 'Yes',
-//                     is_editable: 'No',
-//                     is_viewable: 'Yes',
-//                     Role: 'SubUser',
-//                     status: 'Exist user Invities New subUser'
-//                   }
-
-
-//                   let createtrack = await compUserSubUserTrack.create(filter)
-//                   if (req.body.email) {
-//                     let data = await mailTrigger(req.body.userName, req.body.password, req.body.email, req.body.company_name, 1)
-//                     if (data) {
-//                       res.json({
-//                         statusCode: res.statusCode,
-//                         success: true,
-//                         message: "subUser Created Successfully",
-//                         // user: createdata
-//                       });
-//                     }
-//                   } else {
-//                     let mobiledata = await MobileTrigger(req.body.phone, req.body.password, req.body.email, req.body.company_name, 1)
-//                     if (mobiledata) {
-//                       res.json({
-//                         statusCode: res.statusCode,
-//                         success: true,
-//                         message: "subUser Created Successfully",
-//                         // user: createdata
-//                       });
-//                     }
-//                   }
-//                 }
-//               } else {
-//                 console.log('iam here')
-//                 res.json({
-//                   statusCode: res.statusCode,
-//                   success: false,
-//                   // message: "Already an Subuser" + checkuser.subUser_id + "for the userId" + checkuser.user_id
-//                 })
-//               }
-//             })
-//           }
-//         } else {
-//           res.json({
-//             statusCode: res.statusCode,
-//             success: false,
-//             error: 'Requested user is already an subuser so couldnot be an subuser again',
-//             message: "Something went wrong!"
-//           });
-//         }
-//       })
-//     }
-//   } catch (e) {
-//     res.json({
-//       statusCode: res.statusCode,
-//       success: false,
-//       error: e.message,
-//       message: "Something went wrong!"
-//     });
-//   }
-// }
 
 exports.addSubUser = async function (req, res) {
   try {
@@ -1622,140 +1176,269 @@ exports.addSubUser = async function (req, res) {
       upperCase: false,
       specialChars: false
     });
-    let existingUsersFind = await User.findOne({
-      where: {
-        [Op.or]: [
-          req.body.email ? { email: req.body.email } : null,
-          req.body.phone ? { phone: req.body.phone } : null
-        ]
-      }
-    })
-    if (existingUsersFind != null) {
-      let obj = {
+    let filter = {}
+    filter.where = {}
+    if (req.body.email) {
+      filter.where = {
         main_user_id: req.body.mainUser_id,
-        main_user_name: req.body.mainUsername,
-        main_user_email: req.body.mainUseremail,
-        main_user_phone: req.body.mainUserPhone,
         company_id: req.body.company_id,
-        company_name: req.body.companyName,
-        is_invited: "Yes",
-        sub_user_name: existingUsersFind.dataValues.name,
-        sub_user_email: existingUsersFind.dataValues.email,
-        sub_user_phone: existingUsersFind.dataValues.phone,
-        sub_user_id: existingUsersFind.dataValues.uid,
-        sub_user_unique_id: uniqid()
+        sub_user_email: req.body.email,
       }
-      let userName = existingUsersFind.dataValues.name
-
-      let createSubUser = await addSubusers.create(obj)
-      if (req.body.email) {
-        let data = await mailTrigger(userName, req.body.password, req.body.email, req.body.companyName, 0)
-        console.log('123456')
-        if (data) {
-          console.log('789456123')
-          res.json({
-            statusCode: res.statusCode,
-            success: true,
-            message: "subUser Created Successfully",
-            // user: createdata
-          });
-        }
+    } else if (req.body.phone) {
+      filter.where = {
+        main_user_id: req.body.mainUser_id,
+        company_id: req.body.company_id,
+        sub_user_phone: req.body.phone
+      }
+    }
+    console.log('filter------->', filter)
+    // res.send('ok')
+    let subusers = await addSubusers.findAndCountAll(filter).then(async response => {
+      console.log('res------->', response)
+      if (response.count !=0) {
+        console.log('iam here working1234')
+        res.json({
+          statusCode: res.statusCode,
+          success: false,
+          message: "Already invited the same subuser for the same company " + req.body.companyName
+        })
       } else {
-        let mobiledata = await MobileTrigger(userName, req.body.phone, req.body.password, req.body.companyName, 0)
-        if (mobiledata) {
-          res.json({
-            statusCode: res.statusCode,
-            success: true,
-            message: "subUser Created Successfully",
-            // user: createdata
-          });
-        }
-      }
-
-    } else {
-      let data = {}
-      data.uid = await uniqid();
-      data.name = req.body.subUsername;
-      data.email = req.body.email;
-      data.phone = req.body.phone;
-      data.creation_date = new Date();
-      data.updated_date = new Date();
-      data.status = 1;
-      data.email_otp = emailotp;
-      data.sms_otp = smsotp;
-      data.is_email_verify = 0;
-      data.is_mobile_verify = 0;
-      data.application_type = req.body.application_type
-      data.password = await sha1(req.body.password);
-      let createdata = await User.create(data);
-      if (createdata) {
-        let obj = {
-          main_user_id: req.body.mainUser_id,
-          main_user_name: req.body.mainUsername,
-          main_user_email: req.body.mainUseremail,
-          main_user_phone: req.body.mainUserPhone,
-          company_id: req.body.company_id,
-          company_name: req.body.companyName,
-          is_invited: "Yes",
-          sub_user_name: createdata.dataValues.name,
-          sub_user_email: createdata.dataValues.email,
-          sub_user_phone: createdata.dataValues.phone,
-          sub_user_unique_id: uniqid(),
-          sub_user_id: createdata.dataValues.uid,
-        }
-        let createSubUser = await addSubusers.create(obj)
-        if (createSubUser) {
+        console.log('iam here working4321')
+        let existingUsersFind = await User.findOne({
+          where: {
+            [Op.or]: [
+              req.body.email ? { email: req.body.email } : null,
+              req.body.phone ? { phone: req.body.phone } : null
+            ]
+          }
+        })
+        if (existingUsersFind != null) {
+          let obj = {
+            main_user_id: req.body.mainUser_id,
+            main_user_name: req.body.mainUsername,
+            main_user_email: req.body.mainUseremail,
+            main_user_phone: req.body.mainUserPhone,
+            company_id: req.body.company_id,
+            company_name: req.body.companyName,
+            is_invited: "Yes",
+            sub_user_name: existingUsersFind.dataValues.name,
+            sub_user_email: existingUsersFind.dataValues.email,
+            sub_user_phone: existingUsersFind.dataValues.phone,
+            sub_user_id: existingUsersFind.dataValues.uid,
+            sub_user_unique_id: uniqid()
+          }
+          let createSubUser = await addSubusers.create(obj)
           if (req.body.email) {
-            let data = await mailTrigger(req.body.subUsername, req.body.password, req.body.email, req.body.companyName, 1)
+            let data = await mailTrigger(req.body.mainUsername, req.body.password, req.body.email, req.body.companyName, 0)
             if (data) {
               res.json({
                 statusCode: res.statusCode,
                 success: true,
                 message: "subUser Created Successfully",
-                // user: createdata
               });
             }
           } else {
-            let mobiledata = await MobileTrigger(req.body.subUsername, req.body.phone, req.body.password, req.body.companyName, 1)
+            let mobiledata = await MobileTrigger(req.body.mainUsername, req.body.phone, req.body.password, req.body.companyName, 0)
+            console.log('mobiledata--------->', mobiledata)
             if (mobiledata) {
               res.json({
                 statusCode: res.statusCode,
                 success: true,
                 message: "subUser Created Successfully",
-                // user: createdata
               });
+            }
+          }
+        } else {
+          let data = {}
+          data.uid = await uniqid();
+          data.name = req.body.subUsername;
+          data.email = req.body.email ? req.body.email : "";
+          data.phone = req.body.phone ? req.body.phone : "";
+          data.creation_date = new Date();
+          data.updated_date = new Date();
+          data.status = 1;
+          // data.email_otp = emailotp;
+          // data.sms_otp = smsotp;
+          // data.is_email_verify = 0;
+          // data.is_mobile_verify = 0;
+          data.application_type = req.body.application_type
+          data.password = await sha1(req.body.password);
+          if (req.body.email != undefined) {
+            data.email_otp = emailotp;
+            data.is_email_verify = 0;
+          } else if (req.body.phone != undefined) {
+            data.sms_otp = smsotp;
+            data.is_mobile_verify = 0;
+          }
+          console.log('data---->', data)
+          let createdata = await User.create(data);
+          if (createdata) {
+            let obj = {
+              main_user_id: req.body.mainUser_id,
+              main_user_name: req.body.mainUsername,
+              main_user_email: req.body.mainUseremail,
+              main_user_phone: req.body.mainUserPhone,
+              company_id: req.body.company_id,
+              company_name: req.body.companyName,
+              is_invited: "Yes",
+              sub_user_name: createdata.dataValues.name,
+              sub_user_email: createdata.dataValues.email,
+              sub_user_phone: createdata.dataValues.phone,
+              sub_user_unique_id: uniqid(),
+              sub_user_id: createdata.dataValues.uid,
+            }
+            let createSubUser = await addSubusers.create(obj)
+            if (createSubUser) {
+              if (req.body.email) {
+                let data = await mailTrigger(req.body.mainUsername, req.body.password, req.body.email, req.body.companyName, 1)
+                if (data) {
+                  res.json({
+                    statusCode: res.statusCode,
+                    success: true,
+                    message: "subUser Created Successfully",
+                  });
+                }
+              } else {
+                let mobiledata = await MobileTrigger(req.body.mainUsername, req.body.phone, req.body.password, req.body.companyName, 1)
+                if (mobiledata) {
+                  res.json({
+                    statusCode: res.statusCode,
+                    success: true,
+                    message: "subUser Created Successfully",
+                  });
+                }
+              }
             }
           }
         }
       }
-    }
+    })
+    // let existingUsersFind = await User.findOne({
+    //   where: {
+    //     [Op.or]: [
+    //       req.body.email ? { email: req.body.email } : null,
+    //       req.body.phone ? { phone: req.body.phone } : null
+    //     ]
+    //   }
+    // })
+    // if (existingUsersFind != null) {
+    //   let obj = {
+    //     main_user_id: req.body.mainUser_id,
+    //     main_user_name: req.body.mainUsername,
+    //     main_user_email: req.body.mainUseremail,
+    //     main_user_phone: req.body.mainUserPhone,
+    //     company_id: req.body.company_id,
+    //     company_name: req.body.companyName,
+    //     is_invited: "Yes",
+    //     sub_user_name: existingUsersFind.dataValues.name,
+    //     sub_user_email: existingUsersFind.dataValues.email,
+    //     sub_user_phone: existingUsersFind.dataValues.phone,
+    //     sub_user_id: existingUsersFind.dataValues.uid,
+    //     sub_user_unique_id: uniqid()
+    //   }
+    //   let createSubUser = await addSubusers.create(obj)
+    //   if (req.body.email) {
+    //     let data = await mailTrigger(req.body.mainUsername, req.body.password, req.body.email, req.body.companyName, 0)
+    //     if (data) {
+    //       res.json({
+    //         statusCode: res.statusCode,
+    //         success: true,
+    //         message: "subUser Created Successfully",
+    //       });
+    //     }
+    //   } else {
+    //     let mobiledata = await MobileTrigger(req.body.mainUsername, req.body.phone, req.body.password, req.body.companyName, 0)
+    //     console.log('mobiledata--------->', mobiledata)
+    //     if (mobiledata) {
+    //       res.json({
+    //         statusCode: res.statusCode,
+    //         success: true,
+    //         message: "subUser Created Successfully",
+    //       });
+    //     }
+    //   }
+    // } else {
 
+    //   let data = {}
+    //   data.uid = await uniqid();
+    //   data.name = req.body.subUsername;
+    //   data.email = req.body.email ? req.body.email : "";
+    //   data.phone = req.body.phone ? req.body.phone : "";
+    //   data.creation_date = new Date();
+    //   data.updated_date = new Date();
+    //   data.status = 1;
+    //   // data.email_otp = emailotp;
+    //   // data.sms_otp = smsotp;
+    //   // data.is_email_verify = 0;
+    //   // data.is_mobile_verify = 0;
+    //   data.application_type = req.body.application_type
+    //   data.password = await sha1(req.body.password);
+    //   if (req.body.email != undefined) {
+    //     data.email_otp = emailotp;
+    //     data.is_email_verify = 0;
+    //   } else if (req.body.phone != undefined) {
+    //     data.sms_otp = smsotp;
+    //     data.is_mobile_verify = 0;
+    //   }
+    //   console.log('data---->', data)
+    //   let createdata = await User.create(data);
+    //   if (createdata) {
+    //     let obj = {
+    //       main_user_id: req.body.mainUser_id,
+    //       main_user_name: req.body.mainUsername,
+    //       main_user_email: req.body.mainUseremail,
+    //       main_user_phone: req.body.mainUserPhone,
+    //       company_id: req.body.company_id,
+    //       company_name: req.body.companyName,
+    //       is_invited: "Yes",
+    //       sub_user_name: createdata.dataValues.name,
+    //       sub_user_email: createdata.dataValues.email,
+    //       sub_user_phone: createdata.dataValues.phone,
+    //       sub_user_unique_id: uniqid(),
+    //       sub_user_id: createdata.dataValues.uid,
+    //     }
+    //     let createSubUser = await addSubusers.create(obj)
+    //     if (createSubUser) {
+    //       if (req.body.email) {
+    //         let data = await mailTrigger(req.body.mainUsername, req.body.password, req.body.email, req.body.companyName, 1)
+    //         if (data) {
+    //           res.json({
+    //             statusCode: res.statusCode,
+    //             success: true,
+    //             message: "subUser Created Successfully",
+    //           });
+    //         }
+    //       } else {
+    //         let mobiledata = await MobileTrigger(req.body.mainUsername, req.body.phone, req.body.password, req.body.companyName, 1)
+    //         if (mobiledata) {
+    //           res.json({
+    //             statusCode: res.statusCode,
+    //             success: true,
+    //             message: "subUser Created Successfully",
+    //           });
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   } catch (error) {
-    console.log('error------------------>', error)
     res.json({
       statusCode: res.statusCode,
       success: false,
-      error: e.message,
+      error: error,
       message: "Something went wrong!"
     });
   }
 }
 
-
 async function mailTrigger(userName, Passwrd, email, companyName, type) {
   return new Promise(async (resolve, reject) => {
-    // var html = fs.readFileSync(
-    //   path.resolve(__dirname, "../template/SubUser.html"),
-    //   "utf8"
-    // );
-    console.log('iam here working')
     var html;
     var replacements = {
       userName: userName,
       Password: Passwrd,
       companyName: companyName
     };
-
     if (type == 0) {
       replacements.Password = ''
       html = fs.readFileSync(
@@ -1769,11 +1452,9 @@ async function mailTrigger(userName, Passwrd, email, companyName, type) {
       );
     }
     var template = handlebars.compile(html);
-
     var htmlToSend = template(replacements);
     let userMailName = userName;
-    let mailotpTrigger1 = await mailotpTrigger.otpmailTrigger(email, htmlToSend, userMailName, 0)
-    console.log('mailotpTrigger1------>', mailotpTrigger1)
+    let mailotpTrigger1 = await mailotpTrigger.otpmailTrigger(email, htmlToSend, userMailName, 2)
     if (mailotpTrigger1) {
       resolve('success')
     } else {
@@ -1785,38 +1466,27 @@ async function mailTrigger(userName, Passwrd, email, companyName, type) {
 async function MobileTrigger(userName, phone, passwrd, companyName, type) {
   return new Promise((resolve, reject) => {
     let url = Constant.smsurl;
-    let urlwithnumber = url.concat(phone);//phno            
+    let urlwithnumber = url.concat(phone);
     let v3 = urlwithnumber.concat("&message=");
-    let userName = updatedata.dataValues.name;
-    // let msg1 = `Dear ${userName}, ${data.sms_otp} is the OTP to verify your mobile number.%nRegards,%nTeam, Intellinvest Pvt. Ltd.`
-    // console.log('msg1----------->', msg1)
-    // let v4 = v3.concat(msg1)
-    // console.log('v4------------------->', v4)
-    // let msg = v4;
     var msg;
     if (type == 0) {
-      msg = `You are invited to be an SubUser by ${userName} for the company  ${companyName} in My Accounts App.To Login My Accounts App Kindly Use the click Login below.https://vikramapp.colanapps.in/#/login`
+      msg = `You are invited to be an SubUser by ${userName} for the company ${companyName} in Akum tech To Login Akum tech Kindly Use the Login link below. https://vikramapp.colanapps.in/%23/login Regards,Team, Intellinvest Pvt. Ltd.`
     } else {
-      msg = `You are invited to be an SubUser by ${userName} for the company ${companyName} in My Accounts App.Use this password to Login My Accounts App ${passwrd}.To Login My Accounts App Kindly Use the click Login below.https://vikramapp.colanapps.in/#/login`
+      msg = `You are invited to be a Sub User by ${userName} for the company ${companyName} in Akum tech. Use this password ${passwrd} to Login Akum tech. To Login Akum Tech. Kindly Use the Login link below. https://vikramapp.colanapps.in/%23/login Regards,Team, Intellinvest Pvt. Ltd.`
     }
+    msg = v3.concat(msg)
     axios
       .get(msg)
       .then(function (response) {
-        // handle success
-        console.log('response from sms----->', response);
+        resolve(JSON.stringify(response.data))
       })
       .catch(function (error) {
-        // handle error
-        console.log(error);
-        console.log("error");
+        console.log('error---->', error)
+        resolve(error)
       })
-      .then(function () {
-        // always executed
-        console.log("always");
-      });
-
   })
 }
+
 // for user and subUser
 exports.checkingExistUser = async function (req, res) {
   try {
@@ -1851,42 +1521,3 @@ exports.checkingExistUser = async function (req, res) {
     });
   }
 }
-
-//zoho lead crm integration
-// exports.convertUserToLeads = async function (req, res) {
-//   try {
-//     let usersData = await User.findAll({
-//       limit: req.body.limit,
-//       where: {
-//         isLeadInserted: 'No'
-//       }
-//     }).then(async (getUsers) => {
-//       if (getUsers) {
-//         let userData = [];
-//         for (let i = 0; i < getUsers.length; i++) {
-//           let userobj = {
-//             "Company": getUsers.name,
-//             "Last_Name": getUsers.name,
-//             "First_Name": getUsers.name,
-//             "Email": getUsers.email,
-//           };
-//           userData.push(userobj);
-//         }
-//         let responseLead=await leadApicall(userData)
-//       }
-//     })
-//   } catch {
-//     res.json({
-//       statusCode: res.statusCode,
-//       success: false,
-//       error: e.message,
-//       message: "Something went wrong!"
-//     });
-//   }
-// }
-
-// async function leadApicall(userData){
-//   return new Promise((resolve,reject)=>{
-
-//   })
-// }

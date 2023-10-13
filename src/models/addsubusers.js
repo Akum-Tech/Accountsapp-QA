@@ -86,8 +86,14 @@ const addSubusers = sequelize.define('addsubusers', {
     },
     sub_user_unique_id:{
         type: Sequelize.STRING
+    },
+    creation_date:{
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
+    },updation_date:{
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
     }
-
 })
 sequelize.sync(()=>{
     console.log('sequelize table createed')

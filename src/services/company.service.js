@@ -155,14 +155,14 @@ exports.getAllData = async function (data, res) {
         sub_user_id: data.data.uid
       }
     })
-    console.log('checksubUsers-------------------->', checksubUsers)
+    // console.log('checksubUsers-------------------->', checksubUsers)
     var companyId
     
     let filter={};
     filter.where={}
     if (checksubUsers.length != 0) {
       companyId = [...new Set(checksubUsers.map(x => x.company_id))]
-      console.log('companyId-------------->', companyId)
+      // console.log('companyId-------------->', companyId)
      
       filter.where={
         [Op.or]: {
@@ -223,7 +223,7 @@ exports.getAllData = async function (data, res) {
     //   plain: true
     // }));
     if (resp.length > 0) {
-      console.log('createdata', resp);
+      // console.log('createdata', resp);
       let checkset = [...new Set(resp.map(x => x.user_id))]
       let arr = []
       for (let i = 0; i < checkset.length; i++) {

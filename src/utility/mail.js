@@ -32,46 +32,46 @@ const url = "api.zeptomail.in/";
 const token = "Zoho-enczapikey PHtE6r0PRu7q2GB9+kIG4fftQMDwN4N/qe9lJAIVtI9KDqcHG00G/94uxzfhqR14A/gUEPHOz488teyV5eKDd2fpM2tFXGqyqK3sx/VYSPOZsbq6x00etVkfckXcUYXoddJp1iTSutfYNA==";
 
 
-exports.otpmailTrigger = async function (toemail, html,toName, subjectType) {
-  return new Promise((resolve,reject)=>{
-  let subject;
-  if (subjectType == 0) {
-    subject = "Otp for verify Email ID"
-  } else if (subjectType == 1) {
-    subject = "Otp for forget password"
+exports.otpmailTrigger = async function (toemail, html, toName, subjectType) {
+  return new Promise((resolve, reject) => {
+    let subject;
+    if (subjectType == 0) {
+      subject = "Otp for verify Email ID"
+    } else if (subjectType == 1) {
+      subject = "Otp for forget password"
 
-  } else {
-    subject = "Subuser Invitation"
-  }
-  let client = new SendMailClient({ url, token });
-  client.sendMail({
+    } else if (subjectType == 2) {
+      subject = "Subuser Invitation"
+    }
+    let client = new SendMailClient({ url, token });
+    client.sendMail({
 
-    "from":
-    {
-      "address": "noreply@akum.tech",
-      "name": "noreply"
-    },
-    "to":
-      [
-        {
-          "email_address":
+      "from":
+      {
+        "address": "noreply@akum.tech",
+        "name": "noreply"
+      },
+      "to":
+        [
           {
-            "address": toemail,
-            "name": toName
+            "email_address":
+            {
+              "address": toemail,
+              "name": toName
+            }
           }
-        }
-      ],
-    "subject": subject,
-    "htmlbody": html,
-  }).then((resp) => {
-    console.log("success", resp)
-    resolve(resp)
-  }).catch((error) => {
-    console.log("error", JSON.stringify(error))
-    let errormsg = JSON.stringify(error)
-    resolve(errormsg);
-  });
-})
+        ],
+      "subject": subject,
+      "htmlbody": html,
+    }).then((resp) => {
+      console.log("success", resp)
+      resolve(resp)
+    }).catch((error) => {
+      console.log("error", JSON.stringify(error))
+      let errormsg = JSON.stringify(error)
+      resolve(errormsg);
+    });
+  })
 }
 
 

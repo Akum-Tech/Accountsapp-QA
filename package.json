@@ -39,9 +39,9 @@
     "zeptomail": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.7.7",
-    "@babel/node": "^7.7.7",
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.0",
+    "@babel/node": "^7.22.19",
     "@babel/polyfill": "^7.7.0",
     "@babel/preset-env": "^7.7.7",
     "nodemon": "^1.19.4",
